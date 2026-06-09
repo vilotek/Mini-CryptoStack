@@ -1,0 +1,23 @@
+# Build
+bin/
+obj/
+
+# IDE
+*.user
+*.suo
+.vs/
+.idea/
+.vscode/
+
+# Baza SQLite (lokalne dane)
+*.db
+*.db-shm
+*.db-wal
+
+# Uploady - foldera nie commitujemy, ale tworzymy go runtime
+wwwroot/uploads/*
+!wwwroot/uploads/.gitkeep
+
+# OS
+.DS_Store
+Thumbs.db
