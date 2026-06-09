@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "C:\\Users\\korne\\Desktop\\projekt TI\\Mini-CryptoStack\\CryptoDashboard.csproj": {}
+    "c:\\Users\\korne\\Desktop\\projekt TI\\Mini-CryptoStack\\CryptoDashboard.csproj": {}
   },
   "projects": {
-    "C:\\Users\\korne\\Desktop\\projekt TI\\Mini-CryptoStack\\CryptoDashboard.csproj": {
+    "c:\\Users\\korne\\Desktop\\projekt TI\\Mini-CryptoStack\\CryptoDashboard.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\korne\\Desktop\\projekt TI\\Mini-CryptoStack\\CryptoDashboard.csproj",
+        "projectUniqueName": "c:\\Users\\korne\\Desktop\\projekt TI\\Mini-CryptoStack\\CryptoDashboard.csproj",
         "projectName": "CryptoDashboard",
-        "projectPath": "C:\\Users\\korne\\Desktop\\projekt TI\\Mini-CryptoStack\\CryptoDashboard.csproj",
+        "projectPath": "c:\\Users\\korne\\Desktop\\projekt TI\\Mini-CryptoStack\\CryptoDashboard.csproj",
         "packagesPath": "C:\\Users\\korne\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\korne\\Desktop\\projekt TI\\Mini-CryptoStack\\obj\\",
+        "outputPath": "c:\\Users\\korne\\Desktop\\projekt TI\\Mini-CryptoStack\\obj\\",
         "projectStyle": "PackageReference",
         "configFilePaths": [
           "C:\\Users\\korne\\AppData\\Roaming\\NuGet\\NuGet.Config"

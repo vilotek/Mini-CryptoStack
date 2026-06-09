@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "3zD8w9w3g2Q=",
+  "dgSpecHash": "PyDbeMIu1LQ=",
   "success": true,
-  "projectFilePath": "C:\\Users\\korne\\Desktop\\projekt TI\\Mini-CryptoStack\\CryptoDashboard.csproj",
+  "projectFilePath": "c:\\Users\\korne\\Desktop\\projekt TI\\Mini-CryptoStack\\CryptoDashboard.csproj",
   "expectedPackageFiles": [
     "C:\\Users\\korne\\.nuget\\packages\\humanizer.core\\2.14.1\\humanizer.core.2.14.1.nupkg.sha512",
     "C:\\Users\\korne\\.nuget\\packages\\microsoft.aspnetcore.cryptography.internal\\8.0.10\\microsoft.aspnetcore.cryptography.internal.8.0.10.nupkg.sha512",
