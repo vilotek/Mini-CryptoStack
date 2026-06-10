@@ -1,0 +1,42 @@
+@model List<RankingRow>
+@{ ViewData["Title"] = "Ranking"; }
+
+<h1 class="mb-4">🏆 Ranking inwestorów</h1>
+
+<p class="text-muted">Top użytkowników według aktualnej wartości portfela (saldo USD + wartość posiadanych coinów).</p>
+
+@if (!Model.Any())
+{
+    <p>Brak danych do rankingu.</p>
+}
+else
+{
+    <div class="table-responsive">
+        <table class="table table-hover align-middle">
+            <thead>
+                <tr>
+                    <th style="width:60px">#</th>
+                    <th>Użytkownik</th>
+                    <th class="text-end">Wartość portfela</th>
+                    <th class="text-end">Zysk / strata</th>
+                </tr>
+            </thead>
+            <tbody>
+                @{ var rank = 1; }
+                @foreach (var r in Model)
+                {
+                    var cls = r.PnlPercent >= 0 ? "text-success" : "text-danger";
+                    var sign = r.PnlPercent >= 0 ? "+" : "";
+                    var medal = rank switch { 1 => "🥇", 2 => "🥈", 3 => "🥉", _ => "" };
+                    <tr>
+                        <td><strong>@rank @medal</strong></td>
+                        <td>@r.UserName</td>
+                        <td class="text-end fw-semibold">$@r.TotalValue.ToString("N2")</td>
+                        <td class="text-end @cls">@sign@r.PnlPercent.ToString("N2")%</td>
+                    </tr>
+                    rank++;
+                }
+            </tbody>
+        </table>
+    </div>
+}

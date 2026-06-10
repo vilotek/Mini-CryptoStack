@@ -1,0 +1,40 @@
+@model List<ApplicationUser>
+@{ ViewData["Title"] = "Użytkownicy"; }
+
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h1 class="mb-0">Użytkownicy</h1>
+    <a asp-action="Index" class="btn btn-outline-secondary btn-sm">← Panel</a>
+</div>
+
+<div class="table-responsive">
+    <table class="table table-striped align-middle">
+        <thead>
+            <tr>
+                <th>Email</th>
+                <th class="text-end">Saldo USD</th>
+                <th class="text-end">Saldo startowe</th>
+                <th>Zarejestrowany</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var u in Model)
+            {
+                <tr>
+                    <td>@u.Email</td>
+                    <td class="text-end">$@u.VirtualBalance.ToString("N2")</td>
+                    <td class="text-end">$@u.StartingBalance.ToString("N2")</td>
+                    <td><small>@u.RegisteredAt.ToLocalTime().ToString("g")</small></td>
+                    <td class="text-end">
+                        <form asp-action="ResetUser" method="post" class="d-inline"
+                              onsubmit="return confirm('Zresetować portfel: @u.Email? Usunie wszystkie holdingi i transakcje.');">
+                            @Html.AntiForgeryToken()
+                            <input type="hidden" name="id" value="@u.Id" />
+                            <button class="btn btn-sm btn-outline-warning">🔄 Reset portfela</button>
+                        </form>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
