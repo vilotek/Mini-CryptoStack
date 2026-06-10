@@ -1,0 +1,147 @@
+/* === Bazowy styling === */
+body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    background-color: #f8f9fa;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+main.container {
+    flex: 1;
+}
+
+.card {
+    border: none;
+    border-radius: 0.5rem;
+}
+
+.card.shadow-sm:hover {
+    box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.1) !important;
+    transition: box-shadow 0.2s;
+}
+
+.coin-card-link {
+    display: block;
+}
+
+.coin-card-link:hover .card {
+    transform: translateY(-2px);
+    transition: transform 0.2s ease;
+}
+
+/* Tabela transakcji - lepszy odstęp wierszy */
+.table-sm td, .table-sm th {
+    padding: 0.4rem 0.5rem;
+}
+
+/* === RWD - urządzenia mobilne === */
+
+/* Tablet portrait i mniejsze (< 768px) */
+@media (max-width: 767.98px) {
+    h1 {
+        font-size: 1.5rem;
+    }
+
+    .fs-2 {
+        font-size: 1.5rem !important;
+    }
+
+    .fs-3 {
+        font-size: 1.25rem !important;
+    }
+
+    .fs-4 {
+        font-size: 1.1rem !important;
+    }
+
+    /* Mniejsze paddingi na karcie */
+    .card-body {
+        padding: 0.9rem;
+    }
+
+    /* Brand w nav - mniejsza czcionka */
+    .navbar-brand {
+        font-size: 1rem;
+    }
+
+    /* Tabele - mniejsza czcionka, pozioma przewijalność już od Bootstrap */
+    .table {
+        font-size: 0.875rem;
+    }
+
+    /* Nagłówki sekcji */
+    main.container {
+        padding-left: 0.75rem;
+        padding-right: 0.75rem;
+    }
+}
+
+/* Smartphone (< 576px) */
+@media (max-width: 575.98px) {
+    /* Wszystkie kafelki idą na 1 kolumnę - Bootstrap robi to przez col-sm-*, ale wzmacniamy */
+    .card-body h5 {
+        font-size: 1rem;
+    }
+
+    /* Stopka - mniej miejsca */
+    footer.container {
+        padding-left: 1rem;
+        padding-right: 1rem;
+    }
+
+    footer small {
+        font-size: 0.75rem;
+    }
+
+    /* Przyciski w nawigacji - więcej miejsca */
+    .navbar-nav .nav-link {
+        padding: 0.5rem 0.75rem;
+    }
+
+    /* Tabele - jeszcze mniejsza czcionka */
+    .table {
+        font-size: 0.8rem;
+    }
+
+    /* Hover na touch wyłączamy - powoduje sticky-hover */
+    .coin-card-link:hover .card {
+        transform: none;
+    }
+
+    .card.shadow-sm:hover {
+        box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075) !important;
+    }
+}
+
+/* Tablet landscape (768px - 991px) */
+@media (min-width: 768px) and (max-width: 991.98px) {
+    /* Karty coinów - 2 w rzędzie zamiast 3 (już ogarniane przez col-lg-4) */
+    .card-body {
+        padding: 1rem;
+    }
+}
+
+/* Duże ekrany (> 1400px) - szerszy kontener */
+@media (min-width: 1400px) {
+    main.container,
+    .navbar > .container,
+    footer.container {
+        max-width: 1320px;
+    }
+}
+
+/* === Dostępność: focus styling === */
+.nav-link:focus,
+.btn:focus,
+.form-control:focus {
+    outline: 2px solid #0d6efd;
+    outline-offset: 2px;
+}
+
+/* === Drukowanie === */
+@media print {
+    .navbar, footer, .btn, form {
+        display: none !important;
+    }
+}

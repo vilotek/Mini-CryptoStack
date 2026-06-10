@@ -1,0 +1,83 @@
+@{
+    ViewData["Title"] = "Panel admina";
+    var lastUpdate = ViewBag.LastUpdate as DateTime?;
+}
+
+<h1 class="mb-4">Panel admina</h1>
+
+<div class="row g-3 mb-4">
+    <div class="col-md-4">
+        <div class="card text-bg-primary">
+            <div class="card-body">
+                <h6 class="text-uppercase">Użytkownicy</h6>
+                <div class="fs-2 fw-semibold">@ViewBag.UsersCount</div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card text-bg-info">
+            <div class="card-body">
+                <h6 class="text-uppercase">Coiny</h6>
+                <div class="fs-2 fw-semibold">@ViewBag.CoinsCount</div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card text-bg-success">
+            <div class="card-body">
+                <h6 class="text-uppercase">Transakcje</h6>
+                <div class="fs-2 fw-semibold">@ViewBag.TxCount</div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="card mb-4">
+    <div class="card-body d-flex justify-content-between align-items-center">
+        <div>
+            <h5 class="mb-1">Dane cenowe</h5>
+            <small class="text-muted">
+                @(lastUpdate.HasValue
+                    ? $"Ostatnia aktualizacja: {lastUpdate.Value.ToLocalTime():g}"
+                    : "Brak danych")
+            </small>
+        </div>
+        <form asp-action="RefreshPrices" method="post">
+            @Html.AntiForgeryToken()
+            <button type="submit" class="btn btn-primary">🔄 Odśwież ręcznie</button>
+        </form>
+    </div>
+</div>
+
+<div class="row g-3">
+    <div class="col-md-4">
+        <a asp-action="Users" class="text-decoration-none">
+            <div class="card h-100">
+                <div class="card-body">
+                    <h5>👥 Użytkownicy</h5>
+                    <p class="mb-0 text-muted">Lista użytkowników i reset portfeli.</p>
+                </div>
+            </div>
+        </a>
+    </div>
+    <div class="col-md-4">
+        <a asp-action="Coins" class="text-decoration-none">
+            <div class="card h-100">
+                <div class="card-body">
+                    <h5>📊 Coiny</h5>
+                    <p class="mb-0 text-muted">Dodawaj, edytuj kryptowaluty. Upload logo.</p>
+                </div>
+            </div>
+        </a>
+    </div>
+    <div class="col-md-4">
+        <a asp-action="Settings" class="text-decoration-none">
+            <div class="card h-100">
+                <div class="card-body">
+                    <h5>⚙️ Ustawienia strony</h5>
+                    <p class="mb-0 text-muted">Edytuj nazwę, tagline i stopkę.</p>
+                </div>
+            </div>
+        </a>
+    </div>
+</div>

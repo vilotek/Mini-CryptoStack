@@ -1,0 +1,53 @@
+@model List<ChatMessage>
+@inject Microsoft.AspNetCore.Identity.SignInManager<ApplicationUser> SignInManager
+@{ ViewData["Title"] = "Czat"; }
+
+<h1 class="mb-4">💬 Czat ogólny</h1>
+
+<div class="card mb-3" style="max-height: 500px; overflow-y: auto;" id="chatBox">
+    <div class="card-body">
+        @if (!Model.Any())
+        {
+            <p class="text-muted mb-0">Brak wiadomości — bądź pierwszy!</p>
+        }
+        else
+        {
+            foreach (var m in Model)
+            {
+                <div class="mb-2">
+                    <strong>@(m.User?.UserName ?? "?")</strong>
+                    <small class="text-muted">@m.CreatedAt.ToLocalTime().ToString("g")</small>
+                    <div>@m.Content</div>
+                </div>
+            }
+        }
+    </div>
+</div>
+
+@if (SignInManager.IsSignedIn(User))
+{
+    <form asp-controller="Chat" asp-action="Send" method="post">
+        @Html.AntiForgeryToken()
+        <div class="input-group">
+            <input name="content" class="form-control" placeholder="Napisz wiadomość..."
+                   maxlength="500" required autofocus />
+            <button type="submit" class="btn btn-primary">Wyślij</button>
+        </div>
+    </form>
+}
+else
+{
+    <div class="alert alert-info">
+        Aby pisać, <a asp-area="Identity" asp-page="/Account/Login">zaloguj się</a>.
+    </div>
+}
+
+@section Scripts {
+    <script>
+        // Przewiń do dołu
+        const box = document.getElementById('chatBox');
+        box.scrollTop = box.scrollHeight;
+        // Auto-odświeżanie co 15 sek
+        setTimeout(() => location.reload(), 15000);
+    </script>
+}

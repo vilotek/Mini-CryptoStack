@@ -1,0 +1,138 @@
+@model PortfolioSnapshot
+@{
+    ViewData["Title"] = "Mój portfel";
+    var recent = ViewBag.RecentTx as List<Transaction> ?? new();
+    var pnlCls = Model.TotalPnlUsd >= 0 ? "text-success" : "text-danger";
+    var pnlSign = Model.TotalPnlUsd >= 0 ? "+" : "";
+}
+
+<h1 class="mb-4">Mój portfel</h1>
+
+<div class="row g-3 mb-4">
+    <div class="col-md-3">
+        <div class="card text-bg-light">
+            <div class="card-body">
+                <small class="text-muted">Wartość całkowita</small>
+                <div class="fs-3 fw-semibold">$@Model.TotalValue.ToString("N2")</div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card text-bg-light">
+            <div class="card-body">
+                <small class="text-muted">Saldo USD</small>
+                <div class="fs-3 fw-semibold">$@Model.CashBalance.ToString("N2")</div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card text-bg-light">
+            <div class="card-body">
+                <small class="text-muted">Wartość coinów</small>
+                <div class="fs-3 fw-semibold">$@Model.HoldingsValue.ToString("N2")</div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card text-bg-light">
+            <div class="card-body">
+                <small class="text-muted">P&amp;L total</small>
+                <div class="fs-3 fw-semibold @pnlCls">
+                    @pnlSign$@Model.TotalPnlUsd.ToString("N2")
+                </div>
+                <small class="@pnlCls">@pnlSign@Model.TotalPnlPercent.ToString("N2")%</small>
+            </div>
+        </div>
+    </div>
+</div>
+
+<h3 class="mb-3">Posiadane coiny</h3>
+@if (!Model.Holdings.Any())
+{
+    <div class="alert alert-info">Nie posiadasz jeszcze żadnych coinów. <a asp-controller="Home" asp-action="Index">Idź na rynek</a>.</div>
+}
+else
+{
+    <div class="table-responsive mb-4">
+        <table class="table table-hover align-middle">
+            <thead>
+                <tr>
+                    <th></th>
+                    <th>Symbol</th>
+                    <th class="text-end">Ilość</th>
+                    <th class="text-end">Średni zakup</th>
+                    <th class="text-end">Aktualna cena</th>
+                    <th class="text-end">Wartość</th>
+                    <th class="text-end">P&amp;L</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var h in Model.Holdings)
+                {
+                    var cls = h.PnlUsd >= 0 ? "text-success" : "text-danger";
+                    var sign = h.PnlUsd >= 0 ? "+" : "";
+                    <tr>
+                        <td>
+                            @if (!string.IsNullOrEmpty(h.Coin.ImageUrl))
+                            {
+                                <img src="@h.Coin.ImageUrl" width="24" height="24" alt="" />
+                            }
+                        </td>
+                        <td><strong>@h.Coin.Symbol</strong> <small class="text-muted">@h.Coin.Name</small></td>
+                        <td class="text-end">@h.Quantity.ToString("N8")</td>
+                        <td class="text-end">$@h.AvgBuyPrice.ToString("N4")</td>
+                        <td class="text-end">$@h.CurrentPrice.ToString("N4")</td>
+                        <td class="text-end fw-semibold">$@h.CurrentValue.ToString("N2")</td>
+                        <td class="text-end @cls">
+                            @sign$@h.PnlUsd.ToString("N2")<br />
+                            <small>@sign@h.PnlPercent.ToString("N2")%</small>
+                        </td>
+                        <td class="text-end">
+                            <a asp-controller="Coin" asp-action="Details" asp-route-id="@h.Coin.Id"
+                               class="btn btn-sm btn-outline-primary">Handluj</a>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+}
+
+<h3 class="mb-3">Ostatnie transakcje</h3>
+@if (!recent.Any())
+{
+    <p class="text-muted">Brak transakcji.</p>
+}
+else
+{
+    <div class="table-responsive">
+        <table class="table table-sm align-middle">
+            <thead>
+                <tr>
+                    <th>Data</th>
+                    <th>Typ</th>
+                    <th>Coin</th>
+                    <th class="text-end">Ilość</th>
+                    <th class="text-end">Cena</th>
+                    <th class="text-end">Wartość</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var t in recent)
+                {
+                    var badge = t.Type == TransactionType.Buy ? "bg-success" : "bg-danger";
+                    var label = t.Type == TransactionType.Buy ? "Kupno" : "Sprzedaż";
+                    <tr>
+                        <td><small>@t.Timestamp.ToLocalTime().ToString("g")</small></td>
+                        <td><span class="badge @badge">@label</span></td>
+                        <td>@t.Coin?.Symbol</td>
+                        <td class="text-end">@t.Quantity.ToString("N8")</td>
+                        <td class="text-end">$@t.PricePerUnit.ToString("N4")</td>
+                        <td class="text-end">$@t.TotalUsd.ToString("N2")</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+}

@@ -1,0 +1,32 @@
+@{ ViewData["Title"] = "Ustawienia strony"; }
+
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h1 class="mb-0">Ustawienia strony</h1>
+    <a asp-action="Index" class="btn btn-outline-secondary btn-sm">← Panel</a>
+</div>
+
+<p class="text-muted">Edytuj teksty wyświetlane na stronie. Zmiany są widoczne natychmiast po zapisie (cache odświeża się automatycznie).</p>
+
+<form asp-action="Settings" method="post" class="col-lg-8">
+    @Html.AntiForgeryToken()
+
+    <div class="mb-3">
+        <label class="form-label">Nazwa aplikacji</label>
+        <input name="appName" class="form-control" value="@ViewBag.AppName" maxlength="100" required />
+        <small class="text-muted">Wyświetlana w nawigacji i w tytule karty przeglądarki.</small>
+    </div>
+
+    <div class="mb-3">
+        <label class="form-label">Tagline (opis na stronie głównej)</label>
+        <textarea name="tagline" class="form-control" rows="2" maxlength="500">@ViewBag.Tagline</textarea>
+        <small class="text-muted">Krótki opis pojawiający się pod nagłówkiem strony głównej.</small>
+    </div>
+
+    <div class="mb-3">
+        <label class="form-label">Tekst stopki</label>
+        <textarea name="footerText" class="form-control" rows="2" maxlength="500">@ViewBag.FooterText</textarea>
+        <small class="text-muted">Wyświetlany na dole każdej strony.</small>
+    </div>
+
+    <button type="submit" class="btn btn-primary">Zapisz zmiany</button>
+</form>

@@ -1,0 +1,76 @@
+@model List<Coin>
+@using CryptoDashboard.Services
+@inject SiteSettingsService SiteSettings
+@{
+    ViewData["Title"] = "Rynek";
+    var prices = ViewBag.LatestPrices as Dictionary<int, PricePoint?>;
+    var lastUpdate = ViewBag.LastUpdate as DateTime?;
+    var tagline = await SiteSettings.GetAsync(SiteSetting.KeyTagline, "");
+}
+
+<section aria-labelledby="market-heading">
+    <div class="d-flex flex-wrap justify-content-between align-items-start mb-3 gap-2">
+        <div>
+            <h1 class="mb-1" id="market-heading">Kryptowaluty</h1>
+            @if (!string.IsNullOrWhiteSpace(tagline))
+            {
+                <p class="text-muted mb-0">@tagline</p>
+            }
+        </div>
+        @if (lastUpdate.HasValue)
+        {
+            <small class="text-muted">Ostatnia aktualizacja: <time datetime="@lastUpdate.Value.ToString("o")">@lastUpdate.Value.ToLocalTime().ToString("g")</time></small>
+        }
+    </div>
+
+    @if (!Model.Any())
+    {
+        <div class="alert alert-info" role="alert">Brak coinów w bazie.</div>
+    }
+    else if (prices is null || prices.Values.All(p => p is null))
+    {
+        <div class="alert alert-warning" role="alert">
+            Brak danych cenowych. System pobierze je automatycznie w ciągu kilku sekund. Odśwież stronę.
+        </div>
+    }
+
+    <div class="row g-3">
+        @foreach (var c in Model)
+        {
+            var p = prices != null && prices.TryGetValue(c.Id, out var pp) ? pp : null;
+            <div class="col-sm-6 col-lg-4">
+                <a asp-controller="Coin" asp-action="Details" asp-route-id="@c.Id"
+                   class="text-decoration-none text-reset coin-card-link">
+                    <article class="card shadow-sm h-100">
+                        <div class="card-body">
+                            <div class="d-flex align-items-center mb-3">
+                                @if (!string.IsNullOrEmpty(c.ImageUrl))
+                                {
+                                    <img src="@c.ImageUrl" alt="logo @c.Symbol" width="32" height="32" class="me-2" />
+                                }
+                                <div>
+                                    <h2 class="card-title h5 mb-0">@c.Symbol</h2>
+                                    <small class="text-muted">@c.Name</small>
+                                </div>
+                            </div>
+                            @if (p is not null)
+                            {
+                                <div class="fs-4 fw-semibold">$@p.Price.ToString("N4")</div>
+                                @if (p.Change24h.HasValue)
+                                {
+                                    var cls = p.Change24h >= 0 ? "text-success" : "text-danger";
+                                    var sign = p.Change24h >= 0 ? "+" : "";
+                                    <div class="@cls">@sign@p.Change24h.Value.ToString("N2")% (24h)</div>
+                                }
+                            }
+                            else
+                            {
+                                <em class="text-muted">Brak danych</em>
+                            }
+                        </div>
+                    </article>
+                </a>
+            </div>
+        }
+    </div>
+</section>

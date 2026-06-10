@@ -1,0 +1,122 @@
+@model Coin
+@{
+    ViewData["Title"] = "Coiny";
+    var coins = ViewBag.Coins as List<Coin> ?? new();
+    var isEdit = Model.Id > 0;
+}
+
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h1 class="mb-0">Coiny</h1>
+    <a asp-action="Index" class="btn btn-outline-secondary btn-sm">← Panel</a>
+</div>
+
+<div class="row g-4">
+    <div class="col-lg-7">
+        <div class="card">
+            <div class="card-header"><strong>Lista</strong></div>
+            <div class="table-responsive">
+                <table class="table table-striped align-middle mb-0">
+                    <thead>
+                        <tr>
+                            <th></th>
+                            <th>Symbol</th>
+                            <th>Nazwa</th>
+                            <th>CoinGecko ID</th>
+                            <th></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var c in coins)
+                        {
+                            <tr>
+                                <td>
+                                    @if (!string.IsNullOrEmpty(c.ImageUrl))
+                                    {
+                                        <img src="@c.ImageUrl" width="24" height="24" alt="@c.Symbol" />
+                                    }
+                                </td>
+                                <td><strong>@c.Symbol</strong></td>
+                                <td>@c.Name</td>
+                                <td><code>@c.CoinGeckoId</code></td>
+                                <td class="text-end">
+                                    <a asp-action="Coins" asp-route-editId="@c.Id"
+                                       class="btn btn-sm btn-outline-primary">Edytuj</a>
+                                    <form asp-action="DeleteCoin" method="post" class="d-inline"
+                                          onsubmit="return confirm('Usunąć @c.Symbol?');">
+                                        @Html.AntiForgeryToken()
+                                        <input type="hidden" name="id" value="@c.Id" />
+                                        <button type="submit" class="btn btn-sm btn-outline-danger">Usuń</button>
+                                    </form>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-lg-5">
+        <div class="card">
+            <div class="card-header">
+                <strong>@(isEdit ? "Edycja" : "Nowy coin")</strong>
+                @if (isEdit)
+                {
+                    <a asp-action="Coins" class="btn btn-sm btn-link float-end">Anuluj</a>
+                }
+            </div>
+            <div class="card-body">
+                <form asp-action="SaveCoin" method="post" enctype="multipart/form-data">
+                    @Html.AntiForgeryToken()
+                    <input type="hidden" asp-for="Id" />
+                    <input type="hidden" asp-for="AddedAt" />
+                    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+                    <div class="mb-3">
+                        <label asp-for="Symbol" class="form-label"></label>
+                        <input asp-for="Symbol" class="form-control" placeholder="BTC" />
+                        <span asp-validation-for="Symbol" class="text-danger"></span>
+                    </div>
+
+                    <div class="mb-3">
+                        <label asp-for="Name" class="form-label"></label>
+                        <input asp-for="Name" class="form-control" placeholder="Bitcoin" />
+                        <span asp-validation-for="Name" class="text-danger"></span>
+                    </div>
+
+                    <div class="mb-3">
+                        <label asp-for="CoinGeckoId" class="form-label"></label>
+                        <input asp-for="CoinGeckoId" class="form-control" placeholder="bitcoin" />
+                        <div class="form-text">ID z URL na coingecko.com.</div>
+                        <span asp-validation-for="CoinGeckoId" class="text-danger"></span>
+                    </div>
+
+                    <fieldset class="mb-3 border rounded p-2">
+                        <legend class="fs-6 px-2 mb-2">Logo coina</legend>
+
+                        <div class="mb-2">
+                            <label asp-for="ImageUrl" class="form-label">URL (opcjonalny)</label>
+                            <input asp-for="ImageUrl" class="form-control form-control-sm" placeholder="https://..." />
+                            @if (isEdit && !string.IsNullOrEmpty(Model.ImageUrl))
+                            {
+                                <div class="mt-2 d-flex align-items-center gap-2">
+                                    <img src="@Model.ImageUrl" alt="logo" width="32" height="32" />
+                                    <small class="text-muted">Obecne logo</small>
+                                </div>
+                            }
+                        </div>
+
+                        <div>
+                            <label for="imageFile" class="form-label">Lub uploaduj plik (max 2MB)</label>
+                            <input type="file" id="imageFile" name="imageFile"
+                                   accept=".png,.jpg,.jpeg,.gif,.webp" class="form-control form-control-sm" />
+                            <small class="text-muted">Dozwolone: PNG, JPG, GIF, WebP. Plik nadpisze URL powyżej.</small>
+                        </div>
+                    </fieldset>
+
+                    <button type="submit" class="btn btn-primary">@(isEdit ? "Zapisz" : "Dodaj")</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
