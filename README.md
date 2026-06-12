@@ -14,7 +14,7 @@ Każdy zarejestrowany użytkownik otrzymuje **$10 000 wirtualnych USD** i może 
 5. [Konto admina](#konto-admina)
 6. [Struktura projektu](#struktura-projektu)
 7. [Konfiguracja](#konfiguracja)
-8. [Dokumentacja dodatkowa](#dokumentacja-dodatkowa)
+
 
 ---
 
@@ -206,6 +206,6 @@ W `appsettings.json`:
 |---|---|
 | `Game:StartingBalanceUsd` | Saldo dla nowego usera i reset usera przez admina |
 | `Game:PriceRefreshMinutes` | Co ile minut `BackgroundService` pobiera ceny |
-| `CoinGecko:BaseUrl` | API CoinGecko (zostaw domyślne) |
+| `CoinGecko:BaseUrl` | API CoinGecko ( |
 
 ---
