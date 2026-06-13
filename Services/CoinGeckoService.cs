@@ -67,9 +67,76 @@ public class CoinGeckoService
         }
     }
 
+    /// <summary>
+    /// Dosypuje historyczne ceny sprzed uruchomienia aplikacji z endpointu market_chart.
+    /// Dodaje tylko punkty starsze niż najwcześniejszy już zapisany, więc nie dubluje danych.
+    /// </summary>
+    public async Task<int> BackfillHistoryAsync(int coinId, int days, CancellationToken ct = default)
+    {
+        var coin = await _ctx.Coins.FirstOrDefaultAsync(c => c.Id == coinId, ct);
+        if (coin is null) return 0;
+
+        var earliestExisting = await _ctx.PricePoints
+            .Where(p => p.CoinId == coinId)
+            .OrderBy(p => p.Timestamp)
+            .Select(p => (DateTime?)p.Timestamp)
+            .FirstOrDefaultAsync(ct);
+
+        // Mamy już wystarczająco głęboką historię - nie wołamy ponownie zewnętrznego API.
+        if (earliestExisting is not null && earliestExisting.Value <= DateTime.UtcNow.AddDays(-(days - 2)))
+            return 0;
+
+        var url = $"coins/{Uri.EscapeDataString(coin.CoinGeckoId)}/market_chart" +
+                  $"?vs_currency=usd&days={days}";
+
+        try
+        {
+            using var resp = await _http.GetAsync(url, ct);
+            resp.EnsureSuccessStatusCode();
+
+            var stream = await resp.Content.ReadAsStreamAsync(ct);
+            var data = await JsonSerializer.DeserializeAsync<MarketChartRaw>(stream, cancellationToken: ct);
+
+            if (data?.Prices is null || data.Prices.Count == 0) return 0;
+
+            var added = 0;
+            foreach (var pair in data.Prices)
+            {
+                if (pair.Count < 2) continue;
+                var ts = DateTimeOffset.FromUnixTimeMilliseconds((long)pair[0]).UtcDateTime;
+
+                // Pomijamy punkty z okresu już pokrytego przez dane zbierane na żywo.
+                if (earliestExisting is not null && ts >= earliestExisting.Value) continue;
+
+                _ctx.PricePoints.Add(new PricePoint
+                {
+                    CoinId = coinId,
+                    Price = (decimal)pair[1],
+                    Change24h = null,
+                    Timestamp = ts
+                });
+                added++;
+            }
+
+            if (added > 0) await _ctx.SaveChangesAsync(ct);
+            _logger.LogInformation("CoinGecko: dosypano {Count} historycznych punktów dla {Symbol}.", added, coin.Symbol);
+            return added;
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Błąd pobierania historii z CoinGecko dla {Symbol}.", coin.Symbol);
+            return 0;
+        }
+    }
+
     private sealed class CoinGeckoRaw
     {
         [JsonPropertyName("usd")] public double Usd { get; set; }
         [JsonPropertyName("usd_24h_change")] public double? Usd24hChange { get; set; }
+    }
+
+    private sealed class MarketChartRaw
+    {
+        [JsonPropertyName("prices")] public List<List<double>> Prices { get; set; } = new();
     }
 }

@@ -62,7 +62,19 @@
 <div class="row g-3">
     <div class="col-lg-8">
         <div class="card">
-            <div class="card-header"><strong>Historia ceny</strong></div>
+            <div class="card-header d-flex justify-content-between align-items-center flex-wrap gap-2">
+                <strong>Historia ceny</strong>
+                @if (pointsCount > 0)
+                {
+                    <select id="rangeSelect" class="form-select form-select-sm w-auto">
+                        <option value="24h">Ostatnie 24h</option>
+                        <option value="7d">Ostatnie 7 dni</option>
+                        <option value="30d">Ostatnie 30 dni</option>
+                        <option value="90d">Ostatnie 90 dni</option>
+                        <option value="all" selected>Cały okres</option>
+                    </select>
+                }
+            </div>
             <div class="card-body">
                 @if (pointsCount == 0)
                 {
@@ -70,7 +82,13 @@
                 }
                 else
                 {
+                    <div class="d-flex gap-4 mb-2 small text-muted">
+                        <span>Min: <strong id="statMin" class="text-body">—</strong></span>
+                        <span>Max: <strong id="statMax" class="text-body">—</strong></span>
+                        <span>Zmiana w okresie: <strong id="statChange">—</strong></span>
+                    </div>
                     <canvas id="priceChart" height="160"></canvas>
+                    <p id="chartEmpty" class="text-muted mb-0 d-none">Brak punktów w wybranym okresie.</p>
                 }
             </div>
         </div>
@@ -152,35 +170,88 @@
         <script>
             const coinId = @Model.Id;
             const symbol = '@Model.Symbol';
-            async function loadChart() {
-                const res = await fetch(`/Coin/ChartData/${coinId}`);
+            let priceChart = null;
+
+            const fmt = v => '$' + Number(v).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: v < 1 ? 6 : 2 });
+
+            function updateStats(dataset) {
+                const ys = dataset.map(d => d.y);
+                const min = Math.min(...ys), max = Math.max(...ys);
+                const first = ys[0], last = ys[ys.length - 1];
+                const pct = first !== 0 ? ((last - first) / first) * 100 : 0;
+                document.getElementById('statMin').textContent = fmt(min);
+                document.getElementById('statMax').textContent = fmt(max);
+                const chg = document.getElementById('statChange');
+                const sign = pct >= 0 ? '+' : '';
+                chg.textContent = sign + pct.toFixed(2) + '%';
+                chg.className = pct >= 0 ? 'text-success' : 'text-danger';
+            }
+
+            async function loadChart(range) {
+                const res = await fetch(`/Coin/ChartData/${coinId}?range=${range}`);
                 const data = await res.json();
                 const dataset = data.map(d => ({ x: d.t, y: d.p }));
-                new Chart(document.getElementById('priceChart'), {
+
+                const canvas = document.getElementById('priceChart');
+                const empty = document.getElementById('chartEmpty');
+                if (priceChart) { priceChart.destroy(); priceChart = null; }
+
+                if (dataset.length === 0) {
+                    canvas.classList.add('d-none');
+                    empty.classList.remove('d-none');
+                    ['statMin', 'statMax', 'statChange'].forEach(id => document.getElementById(id).textContent = '—');
+                    return;
+                }
+                canvas.classList.remove('d-none');
+                empty.classList.add('d-none');
+                updateStats(dataset);
+
+                // Oś Y dociśnięta do realnego zakresu danych, żeby drobne ruchy ceny były widoczne
+                const ys = dataset.map(d => d.y);
+                const min = Math.min(...ys), max = Math.max(...ys);
+                const pad = (max - min) * 0.12 || max * 0.01 || 1;
+
+                // Kolor zależny od trendu w wybranym okresie
+                const up = ys[ys.length - 1] >= ys[0];
+                const color = up ? '#198754' : '#dc3545';
+                const fillColor = up ? 'rgba(25,135,84,0.10)' : 'rgba(220,53,69,0.10)';
+
+                priceChart = new Chart(canvas, {
                     type: 'line',
                     data: {
                         datasets: [{
                             label: symbol + ' / USD',
                             data: dataset,
-                            borderColor: '#0d6efd',
-                            backgroundColor: 'rgba(13,110,253,0.08)',
-                            fill: true, tension: 0.25, pointRadius: 2, borderWidth: 2
+                            borderColor: color,
+                            backgroundColor: fillColor,
+                            fill: true, tension: 0.25,
+                            pointRadius: dataset.length > 60 ? 0 : 2,
+                            pointHoverRadius: 4,
+                            borderWidth: 2
                         }]
                     },
                     options: {
                         responsive: true,
+                        interaction: { mode: 'index', intersect: false },
                         scales: {
                             x: { type: 'time', time: { tooltipFormat: 'PPpp' } },
-                            y: { ticks: { callback: v => '$' + v } }
+                            y: {
+                                min: min - pad,
+                                max: max + pad,
+                                ticks: { callback: v => fmt(v) }
+                            }
                         },
                         plugins: {
                             legend: { display: false },
-                            tooltip: { callbacks: { label: c => '$' + Number(c.parsed.y).toFixed(4) } }
+                            tooltip: { callbacks: { label: c => fmt(c.parsed.y) } }
                         }
                     }
                 });
             }
-            loadChart();
+
+            const rangeSelect = document.getElementById('rangeSelect');
+            rangeSelect.addEventListener('change', () => loadChart(rangeSelect.value));
+            loadChart(rangeSelect.value);
         </script>
     }
 }

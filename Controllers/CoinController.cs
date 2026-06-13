@@ -49,10 +49,22 @@ public class CoinController : Controller
     }
 
     [HttpGet]
-    public async Task<IActionResult> ChartData(int id)
+    public async Task<IActionResult> ChartData(int id, string range = "all")
     {
-        var points = await _ctx.PricePoints
-            .Where(p => p.CoinId == id)
+        var query = _ctx.PricePoints.Where(p => p.CoinId == id);
+
+        DateTime? from = range switch
+        {
+            "24h" => DateTime.UtcNow.AddDays(-1),
+            "7d" => DateTime.UtcNow.AddDays(-7),
+            "30d" => DateTime.UtcNow.AddDays(-30),
+            "90d" => DateTime.UtcNow.AddDays(-90),
+            _ => null
+        };
+        if (from is not null)
+            query = query.Where(p => p.Timestamp >= from);
+
+        var points = await query
             .OrderBy(p => p.Timestamp)
             .Select(p => new
             {
