@@ -45,12 +45,6 @@ Aplikacja jest klasyczną aplikacją **ASP.NET Core 8 MVC** z bazą **SQLite** i
    └──────────────────────────────────────────┘
 ```
 
-### Dlaczego MVC, nie SPA?
-
-- Mniej zależności i prostsze wdrożenie
-- Naturalny scaffolding Identity (rejestracja, logowanie, reset hasła)
-- Punktowa interaktywność (wykres) wystarczy — nie potrzebujemy stanu klienta dla całej aplikacji
-- Łatwiej obronić na egzaminie (jeden język, jeden runtime)
 
 ### Wzorce użyte w kodzie
 
