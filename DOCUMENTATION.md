@@ -287,31 +287,6 @@ Wszystkie widoki używają poprawnej semantyki HTML5:
 
 ---
 
-## 6. Możliwe rozszerzenia
 
-- **SignalR** dla czatu real-time (zamiast polling co 15s)
-- **Historia portfela** — snapshot co X godzin, wykres wartości w czasie
-- **Achievementy** — pierwsza transakcja, +10%, +50%, +100%
-- **Limit transakcji per minute** (rate limiting)
-- **Eksport historii** do CSV
-- **PWA** — Service Worker, możliwość instalacji na telefonie
 
----
 
-## 7. Diagnostyka
-
-### Gdzie są logi?
-
-Konsola `dotnet run`. Najważniejsze klasy z logowaniem:
-- `CoinGeckoService` — info o liczbie zapisanych punktów, błędach HTTP
-- `PriceUpdateService` — start, każdy tick, błędy
-- `Program` — błędy seedowania bazy
-
-### Częste problemy
-
-| Problem | Rozwiązanie |
-|---|---|
-| `dotnet ef migrations add` → "command not found" | `dotnet tool install --global dotnet-ef` |
-| Pusta lista cen na rynku | poczekaj 15 sek po starcie aplikacji |
-| Błąd 500 przy rejestracji | `IEmailSender` musi być zarejestrowany (jest, jako `NoOpEmailSender`) |
-| Konflikt migracji | usuń `crypto.db` + folder `Migrations/` i wygeneruj od nowa |
